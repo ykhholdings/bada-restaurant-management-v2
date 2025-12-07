@@ -1,10 +1,10 @@
 /*************************************************
- * app.js - BADA Management System (build v1)
+ * app.js - BADA Management System (JSONP ver)
  *************************************************/
 
-console.log('BADA app.js loaded: build v1');
+console.log('BADA app.js loaded: JSONP build');
 
-// Google Apps Script Web App URL
+/* Web App URL (doGet용) */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyQz2vsk5jPXOV5CEpIXvkWQ9LKMiD-KtqINGifyg672PTvsY48jWWaNN3I4qTRl6-S/exec';
 
 /*************************************************
@@ -54,34 +54,54 @@ function setLoading(isLoading) {
 }
 
 /**
- * API 호출 (CORS preflight 피하려고 text/plain 사용)
+ * JSONP 방식 API 호출
+ *  - <script src="...callback=...&payload=..."></script> 를 동적으로 붙여서 실행
+ *  - CORS 영향을 받지 않는다.
  */
-async function callApi(payload) {
-  console.log('Calling API with payload:', payload);
+function callApi(payload) {
+  return new Promise((resolve, reject) => {
+    const callbackName =
+      'bada_cb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
 
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      // ★ text/plain 으로 보내야 preflight 안 뜸
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify(payload)
+    // 전역 콜백 함수 등록
+    window[callbackName] = function (resp) {
+      try {
+        delete window[callbackName];
+      } catch (e) {}
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+
+      if (!resp || !resp.ok) {
+        reject(new Error(resp && resp.error ? resp.error : 'API_ERROR'));
+      } else {
+        resolve(resp.data);
+      }
+    };
+
+    const query =
+      'callback=' +
+      encodeURIComponent(callbackName) +
+      '&payload=' +
+      encodeURIComponent(JSON.stringify(payload));
+
+    const url = API_URL + '?' + query;
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.async = true;
+    script.onerror = function () {
+      try {
+        delete window[callbackName];
+      } catch (e) {}
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      reject(new Error('NETWORK_ERROR'));
+    };
+
+    document.body.appendChild(script);
   });
-
-  const text = await res.text();
-  console.log('Raw response text:', text);
-
-  let json;
-  try {
-    json = JSON.parse(text);
-  } catch (e) {
-    throw new Error('INVALID_JSON_RESPONSE');
-  }
-
-  if (!json.ok) {
-    throw new Error(json.error || 'API_ERROR');
-  }
-  return json.data;
 }
 
 /*************************************************
@@ -245,7 +265,7 @@ if (logoutBtn) {
  *************************************************/
 
 (function init() {
-  console.log('BADA app init');
+  console.log('BADA app init (JSONP)');
   const session = getSession();
   if (session) {
     showDashboard(session);
