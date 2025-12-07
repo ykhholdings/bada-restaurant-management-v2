@@ -13,6 +13,9 @@ const API = {
 
       const response = await fetch(CONFIG.API_URL, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
         body: JSON.stringify(payload),
         redirect: 'follow'
       });
@@ -79,3 +82,10 @@ const API = {
     return await this.call('attendance.list', { employeeId, month, year });
   }
 };
+```
+
+---
+
+**Commit message:**
+```
+Fix CORS - Add Content-Type text/plain
