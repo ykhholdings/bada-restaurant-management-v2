@@ -1,9 +1,15 @@
 /*************************************************
- * app.js - Frontend for BADA Management System
+ * app.js - BADA Management System (build v1)
  *************************************************/
 
-// 새로운 Web App URL
+console.log('BADA app.js loaded: build v1');
+
+// Google Apps Script Web App URL
 const API_URL = 'https://script.google.com/macros/s/AKfycbyQz2vsk5jPXOV5CEpIXvkWQ9LKMiD-KtqINGifyg672PTvsY48jWWaNN3I4qTRl6-S/exec';
+
+/*************************************************
+ * DOM Elements
+ *************************************************/
 
 const loginCard = document.getElementById('login-card');
 const dashCard = document.getElementById('dash-card');
@@ -47,17 +53,31 @@ function setLoading(isLoading) {
   }
 }
 
-// 🔑 CORS preflight 안 뜨게 text/plain 사용
+/**
+ * API 호출 (CORS preflight 피하려고 text/plain 사용)
+ */
 async function callApi(payload) {
+  console.log('Calling API with payload:', payload);
+
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
+      // ★ text/plain 으로 보내야 preflight 안 뜸
       'Content-Type': 'text/plain;charset=utf-8'
     },
     body: JSON.stringify(payload)
   });
 
-  const json = await res.json();
+  const text = await res.text();
+  console.log('Raw response text:', text);
+
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    throw new Error('INVALID_JSON_RESPONSE');
+  }
+
   if (!json.ok) {
     throw new Error(json.error || 'API_ERROR');
   }
@@ -91,7 +111,7 @@ function clearSession() {
 }
 
 /*************************************************
- * UI: Routing
+ * UI Routing
  *************************************************/
 
 function showLogin() {
@@ -108,16 +128,16 @@ function showDashboard(session) {
   const branch = user.branch || '';
 
   dashTitle.textContent = `Welcome, ${user.name || 'User'}`;
-  dashSubtitle.textContent = branch && branch !== 'ALL'
-    ? `Branch: ${branch}`
-    : 'All branches access';
+  dashSubtitle.textContent =
+    branch && branch !== 'ALL' ? `Branch: ${branch}` : 'All branches access';
 
   roleBadge.textContent = role;
 
   renderButtonsByRole(role);
 
   if (role === 'STAFF' || role === 'MANAGER') {
-    managerNoteBody.textContent = 'This is where your branch manager announcements will appear.';
+    managerNoteBody.textContent =
+      'This is where your branch manager announcements will appear.';
     managerNote.classList.remove('hidden');
   } else {
     managerNote.classList.add('hidden');
@@ -155,7 +175,7 @@ function renderButtonsByRole(role) {
     );
   }
 
-  buttons.forEach(btn => {
+  buttons.forEach((btn) => {
     const el = document.createElement('button');
     el.className = 'big-btn';
     el.innerHTML = `
@@ -193,33 +213,39 @@ async function handleLoginClick() {
     saveSession(data.token, data.user);
     setStatus('Login successful.', 'success');
     showDashboard({ token: data.token, user: data.user });
-
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     setStatus('Login failed: ' + (err.message || 'Unknown error'), 'error');
   } finally {
     setLoading(false);
   }
 }
 
-loginBtn.addEventListener('click', handleLoginClick);
+if (loginBtn) {
+  loginBtn.addEventListener('click', handleLoginClick);
+}
 
-passwordInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    handleLoginClick();
-  }
-});
+if (passwordInput) {
+  passwordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      handleLoginClick();
+    }
+  });
+}
 
-logoutBtn.addEventListener('click', () => {
-  clearSession();
-  showLogin();
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    clearSession();
+    showLogin();
+  });
+}
 
 /*************************************************
- * On load
+ * Init
  *************************************************/
 
 (function init() {
+  console.log('BADA app init');
   const session = getSession();
   if (session) {
     showDashboard(session);
