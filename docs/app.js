@@ -5,7 +5,7 @@
 console.log('BADA app.js loaded: JSONP build v2');
 
 /* Web App URL (doGet용) */
-const API_URL = 'https://script.google.com/macros/s/AKfycbw8zOjHKnrP7En5-iFO3CT2Mq6O5qKA5myK8nfEPr7SE8U24A_Fo1ZADusGaq8EvDlQ/exec';
+const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjK1O9xXA6qSU5D0x7IAvHbUIydPBZcbSN1DqHkXg5UROUz_VZkKuONvZKL1MR8Pm261zt04-nBFMoUmKno0quXx_dYO0NszrKsOen1WMUG_6BzOljGuHin1l-T5G80OKgyretyDwAWV7gocYPnoNM9z3oX8Hh9ikyFeZcBovkRrolIdlZFgXzQCR3V2NXWhXkC-sy9OT47jiMV_F0F24dajNG2ifoVpbPpmqZvfksoBCzd_NL-eacrNjvh3E_YTr_0UYrkXyopqYQa7umbKa_Oe4NyrA&lib=M39oERNYxIYuU1HaIbnxogCOLEqDxVXCd';
 
 /*************************************************
  * DOM Elements
