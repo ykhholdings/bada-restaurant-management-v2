@@ -2,7 +2,8 @@
  * app.js - Frontend for BADA Management System
  *************************************************/
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbwcv0pT0gTdPPTAeaqBB3iXoB-c8xg8Qpzs693WJnPKzcTGJav-nOKJpPGEfHuwUdoh/exec';
+// 새로운 Web App URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbyQz2vsk5jPXOV5CEpIXvkWQ9LKMiD-KtqINGifyg672PTvsY48jWWaNN3I4qTRl6-S/exec';
 
 const loginCard = document.getElementById('login-card');
 const dashCard = document.getElementById('dash-card');
@@ -46,12 +47,12 @@ function setLoading(isLoading) {
   }
 }
 
+// 🔑 CORS preflight 안 뜨게 text/plain 사용
 async function callApi(payload) {
   const res = await fetch(API_URL, {
     method: 'POST',
-    mode: 'cors',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'text/plain;charset=utf-8'
     },
     body: JSON.stringify(payload)
   });
@@ -113,10 +114,8 @@ function showDashboard(session) {
 
   roleBadge.textContent = role;
 
-  // 역할별 버튼 구성
   renderButtonsByRole(role);
 
-  // 매니저 노트 (지금은 더미 텍스트, 나중에 Announcements API 연결)
   if (role === 'STAFF' || role === 'MANAGER') {
     managerNoteBody.textContent = 'This is where your branch manager announcements will appear.';
     managerNote.classList.remove('hidden');
@@ -132,69 +131,27 @@ function renderButtonsByRole(role) {
 
   if (role === 'ADMIN') {
     buttons.push(
-      {
-        label: 'Purchases',
-        desc: 'Manage branch purchase records & item prices'
-      },
-      {
-        label: 'Sales',
-        desc: 'Branch daily closing & reports'
-      },
-      {
-        label: 'Attendance',
-        desc: 'Staff check-in overview & approval'
-      },
-      {
-        label: 'Payroll',
-        desc: 'Salary calculation & monthly payouts'
-      },
-      {
-        label: 'Users',
-        desc: 'User accounts & permissions'
-      },
-      {
-        label: 'Activity Log',
-        desc: 'Full change history of the system'
-      }
+      { label: 'Purchases', desc: 'Manage branch purchase records & item prices' },
+      { label: 'Sales', desc: 'Branch daily closing & reports' },
+      { label: 'Attendance', desc: 'Staff check-in overview & approval' },
+      { label: 'Payroll', desc: 'Salary calculation & monthly payouts' },
+      { label: 'Users', desc: 'User accounts & permissions' },
+      { label: 'Activity Log', desc: 'Full change history of the system' }
     );
   } else if (role === 'MANAGER') {
     buttons.push(
-      {
-        label: 'My Branch Sales',
-        desc: 'View daily closing data & trends'
-      },
-      {
-        label: 'My Branch Purchases',
-        desc: 'Approve and review branch purchases'
-      },
-      {
-        label: 'Attendance',
-        desc: 'Approve staff attendance & half-days'
-      },
-      {
-        label: 'Payroll',
-        desc: 'View salary calculations for your team'
-      },
-      {
-        label: 'Announcements',
-        desc: 'Post messages for your staff'
-      }
+      { label: 'My Branch Sales', desc: 'View daily closing data & trends' },
+      { label: 'My Branch Purchases', desc: 'Approve and review branch purchases' },
+      { label: 'Attendance', desc: 'Approve staff attendance & half-days' },
+      { label: 'Payroll', desc: 'View salary calculations for your team' },
+      { label: 'Announcements', desc: 'Post messages for your staff' }
     );
   } else {
     // STAFF
     buttons.push(
-      {
-        label: 'Check-in / Check-out',
-        desc: 'Register your attendance with GPS'
-      },
-      {
-        label: 'My Attendance',
-        desc: 'Review your working days this month'
-      },
-      {
-        label: 'My Payroll',
-        desc: 'See your calculated salary for each month'
-      }
+      { label: 'Check-in / Check-out', desc: 'Register your attendance with GPS' },
+      { label: 'My Attendance', desc: 'Review your working days this month' },
+      { label: 'My Payroll', desc: 'See your calculated salary for each month' }
     );
   }
 
@@ -259,7 +216,7 @@ logoutBtn.addEventListener('click', () => {
 });
 
 /*************************************************
- * On load: auto-login if session exists
+ * On load
  *************************************************/
 
 (function init() {
