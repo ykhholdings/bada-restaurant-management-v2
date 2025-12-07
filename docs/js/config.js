@@ -1,7 +1,7 @@
 // config.js - API 설정
 
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxlKADi2k5QsqewZC8XolKX6csvIaS326YM966JIui6aK37237R9Ptw4Y7kboK8OScHLg/exec',
+  API_URL: 'https://script.google.com/a/macros/ykhholdings.com/s/AKfycbxvmz8LW6HSTwj9f5NIpgR-SfumKU0UNQmzLiNrmCcg_K1cbH5jtJ_u7L3pE1cUYinjeg/exec',
   
   STORAGE_KEY: 'bada_auth_token',
   USER_KEY: 'bada_user',
