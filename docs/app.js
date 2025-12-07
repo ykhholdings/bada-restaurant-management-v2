@@ -1,11 +1,11 @@
 /*************************************************
- * app.js - BADA Management System (JSONP ver)
+ * app.js - BADA Management System (JSONP build v2)
  *************************************************/
 
-console.log('BADA app.js loaded: JSONP build');
+console.log('BADA app.js loaded: JSONP build v2');
 
 /* Web App URL (doGet용) */
-const API_URL = 'https://script.google.com/macros/s/AKfycbyQz2vsk5jPXOV5CEpIXvkWQ9LKMiD-KtqINGifyg672PTvsY48jWWaNN3I4qTRl6-S/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbw8zOjHKnrP7En5-iFO3CT2Mq6O5qKA5myK8nfEPr7SE8U24A_Fo1ZADusGaq8EvDlQ/exec';
 
 /*************************************************
  * DOM Elements
@@ -55,15 +55,13 @@ function setLoading(isLoading) {
 
 /**
  * JSONP 방식 API 호출
- *  - <script src="...callback=...&payload=..."></script> 를 동적으로 붙여서 실행
- *  - CORS 영향을 받지 않는다.
  */
 function callApi(payload) {
   return new Promise((resolve, reject) => {
     const callbackName =
       'bada_cb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
 
-    // 전역 콜백 함수 등록
+    // 전역 콜백 등록
     window[callbackName] = function (resp) {
       try {
         delete window[callbackName];
@@ -230,6 +228,7 @@ async function handleLoginClick() {
       password
     });
 
+    // loginUser가 { token, user } 리턴한다고 가정
     saveSession(data.token, data.user);
     setStatus('Login successful.', 'success');
     showDashboard({ token: data.token, user: data.user });
@@ -265,7 +264,7 @@ if (logoutBtn) {
  *************************************************/
 
 (function init() {
-  console.log('BADA app init (JSONP)');
+  console.log('BADA app init (JSONP v2)');
   const session = getSession();
   if (session) {
     showDashboard(session);
