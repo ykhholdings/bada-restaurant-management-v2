@@ -3,14 +3,20 @@ const API = {
     try {
       const token = localStorage.getItem(CONFIG.STORAGE_KEY);
       const payload = { action: action, data: data, token: token };
-      const response = await fetch(CONFIG.API_URL, {
+      
+      // CORS Proxy 사용
+      const proxyUrl = 'https://corsproxy.io/?';
+      const targetUrl = encodeURIComponent(CONFIG.API_URL);
+      
+      const response = await fetch(proxyUrl + targetUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload),
-        redirect: 'follow'
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+      
       if (!response.ok) throw new Error('Network error');
       const result = await response.json();
+      
       if (!result.success && result.message && result.message.includes('Invalid or expired session')) {
         localStorage.removeItem(CONFIG.STORAGE_KEY);
         localStorage.removeItem(CONFIG.USER_KEY);
